@@ -9,6 +9,7 @@ const SUGGESTIONS = [
     'Which items have never been sold?',
 ]
 
+const open = ref(false)
 const messages = ref([]) // [{ role: 'user' | 'assistant', content }]
 const input = ref('')
 const loading = ref(false)
@@ -52,8 +53,12 @@ function onKeydown(e) {
 </script>
 
 <template>
-    <section class="card chat">
-        <h3>Ask about your shop 🌸</h3>
+    <!-- v-show (not v-if) so the conversation survives closing the window -->
+    <section v-show="open" class="card chat" role="dialog" aria-label="Ask about your shop">
+        <header class="chat-header">
+            <h3>Ask about your shop 🌸</h3>
+            <button class="close" aria-label="Close chat" @click="open = false">✕</button>
+        </header>
 
         <div ref="listEl" class="messages">
         <div v-if="!messages.length" class="empty">
@@ -81,14 +86,64 @@ function onKeydown(e) {
         <button type="submit" :disabled="loading || !input.trim()">Send</button>
         </form>
     </section>
+
+    <button
+        class="launcher"
+        :aria-label="open ? 'Close chat' : 'Ask about your shop'"
+        :aria-expanded="open"
+        aria-describedby="chat-tooltip"
+        @click="open = !open"
+    >{{ open ? '✕' : '🌸' }}</button>
+    <span v-if="!open" id="chat-tooltip" role="tooltip" class="tooltip">
+        Ask AI about your sales, customers &amp; flowers
+    </span>
 </template>
 
 <style scoped>
-.chat { display: flex; flex-direction: column; gap: 12px; }
+/* Floating chat window pinned to the bottom-right of the screen */
+.chat {
+    position: fixed; right: 24px; bottom: 96px; z-index: 1000;
+    width: 380px; max-height: calc(100vh - 120px);
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.18);
+}
+.chat-header { display: flex; justify-content: space-between; align-items: center; }
 h3 { margin: 0; font-size: 16px; }
+.close { border: none; background: none; font-size: 16px; color: #888; cursor: pointer; padding: 4px; }
 .messages {
-    height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-    padding: 4px;
+    height: 360px; min-height: 0; flex-shrink: 1; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 10px; padding: 4px;
+}
+.launcher {
+    position: fixed; right: 24px; bottom: 24px; z-index: 1000;
+    width: 56px; height: 56px; border: none; border-radius: 50%;
+    background: #e8577d; color: #fff; font-size: 24px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(232,87,125,.45);
+}
+.launcher:hover { background: #d9466d; }
+
+/* Tooltip to the left of the launcher, shown on hover / keyboard focus */
+.tooltip {
+    position: fixed; right: 92px; bottom: 38px; z-index: 1000;
+    padding: 6px 12px; border-radius: 8px; background: #333; color: #fff;
+    font-size: 13px; white-space: nowrap; pointer-events: none;
+    opacity: 0; transform: translateX(6px); transition: opacity .15s, transform .15s;
+}
+.tooltip::after {
+    content: ''; position: absolute; top: 50%; right: -5px; margin-top: -5px;
+    border: 5px solid transparent; border-right: 0; border-left-color: #333;
+}
+.launcher:focus-visible + .tooltip { opacity: 1; transform: none; }
+/* Only on devices with a real mouse, so it doesn't stick after a tap on phones */
+@media (hover: hover) {
+    .launcher:hover + .tooltip { opacity: 1; transform: none; }
+}
+
+/* Phones: chat takes the full width above the launcher */
+@media (max-width: 640px) {
+    .chat { right: 12px; left: 12px; bottom: 84px; width: auto; }
+    .launcher { right: 16px; bottom: 16px; }
+    .tooltip { right: 84px; bottom: 30px; }
 }
 .empty p { margin: 0 0 8px; color: #888; font-size: 14px; }
 .chip {

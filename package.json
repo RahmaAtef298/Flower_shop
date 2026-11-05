@@ -1,7 +1,8 @@
 {
-  "name": "flower-dashboard",
+  "name": "flower-shop-dashboard",
+  "version": "1.0.0",
+  "description": "AI-powered sales dashboard for ERPNext, built with Vue 3, Express and Claude",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

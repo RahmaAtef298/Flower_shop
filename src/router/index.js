@@ -5,13 +5,13 @@ const routes = [
     { path: '/', redirect: '/dashboard' },
     {
         path: '/login',
-        name: 'Login',
+        name: 'login',
         component: () => import('../views/LoginView.vue'),
         meta: { guestOnly: true, title: 'Sign in' },
     },
     {
         path: '/dashboard',
-        name: 'Dashboard',
+        name: 'dashboard',
         component: () => import('../views/DashboardView.vue'),
         meta: { requiresAuth: true, title: 'Dashboard' },
     },

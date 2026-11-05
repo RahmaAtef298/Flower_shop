@@ -41,13 +41,14 @@ const groups = computed(() => salesByGroup(lines.value))
             <ChartCard title="Sales by Category" :rows="groups" type="doughnut" />
         </div>
 
-        <ChatPanel />
         <InvoicesTable :invoices="invoices" />
         </template>
+
+        <ChatPanel />
     </div>
 </template>
 
 <style scoped>
-.dashboard { display: grid; gap: 24px; }
+.dashboard { display: grid; gap: 24px; padding-bottom: 72px; /* room for the chat button */ }
 .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
 </style>
